@@ -14,15 +14,16 @@ const imageminPng = require("imagemin-pngquant");
 const imageminGif = require("imagemin-gifsicle");
 const browserSync = require("browser-sync").create();
 
-const html = () =>
-  src(["./src/ejs/**/*.ejs", "!" + "./src/ejs/**/_*.ejs"])
+const html = () => {
+  return src(["./src/ejs/**/*.ejs", "!" + "./src/ejs/**/_*.ejs"])
     .pipe(ejs({}, {}, { ext: ".html" }))
     .pipe(rename({ extname: ".html" }))
     .pipe(htmlmin({ collapseWhitespace: true, removeComments: true }))
     .pipe(dest("./docs"));
+};
 
-const css = () =>
-  src("./src/scss/**/*.scss")
+const css = () => {
+  return src("./src/scss/**/*.scss")
     .pipe(
       sass({
         outputStyle: "compressed",
@@ -33,17 +34,19 @@ const css = () =>
     .pipe(footer("</style>"))
     .pipe(rename("_style.ejs"))
     .pipe(dest("./src/ejs"));
+};
 
-const js = () =>
-  src("./src/js/**/*.js")
+const js = () => {
+  return src("./src/js/**/*.js")
     .pipe(uglify())
     .pipe(header("<script>"))
     .pipe(footer("</script>"))
     .pipe(rename("_script.ejs"))
     .pipe(dest("./src/ejs"));
+};
 
-const image = () => 
-  src("src/images/**/*.+(jpg|jpeg|png|gif)")
+const image = () => {
+  return src("src/images/**/*.+(jpg|jpeg|png|gif)")
     .pipe(changed("./docs/images"))
     .pipe(
       imagemin([
@@ -57,18 +60,20 @@ const image = () =>
       ])
     )
     .pipe(dest("./docs/images"));
+};
 
-const watchFiles = () =>
+const watchFiles = () => {
   browserSync.init({
     server: {
       baseDir: "./docs",
     },
   });
-watch("./src/ejs/**/*.ejs", html);
-watch("./src/scss/**/*.scss", css);
-watch("./src/js/**/*.js", js);
-watch("./src/images/**/*", image);
-watch("./docs/**/*").on("change", browserSync.reload);
+  watch("./src/ejs/**/*.ejs", html);
+  watch("./src/scss/**/*.scss", css);
+  watch("./src/js/**/*.js", js);
+  watch("./src/images/**/*", image);
+  watch("./docs/**/*").on("change", browserSync.reload);
+};
 
 exports.html = html;
 exports.css = css;
