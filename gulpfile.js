@@ -4,7 +4,7 @@ const ejs = require("gulp-ejs");
 const htmlmin = require("gulp-htmlmin");
 const header = require("gulp-header");
 const footer = require("gulp-footer");
-const uglify = require('gulp-uglify-es').default;
+const uglify = require("gulp-uglify-es").default;
 const sass = require("gulp-sass");
 const autoprefixer = require("gulp-autoprefixer");
 const changed = require("gulp-changed");
@@ -15,7 +15,7 @@ const imageminGif = require("imagemin-gifsicle");
 const browserSync = require("browser-sync").create();
 
 const html = () => {
-  return src(["./src/ejs/**/*.ejs", "!" + "./src/ejs/**/_*.ejs"])
+  return src(["./src/ejs/**/*.ejs", "!./src/ejs/**/_*.ejs"])
     .pipe(ejs({}, {}, { ext: ".html" }))
     .pipe(rename({ extname: ".html" }))
     .pipe(htmlmin({ collapseWhitespace: true, removeComments: true }))
@@ -46,7 +46,7 @@ const js = () => {
 };
 
 const image = () => {
-  return src("src/images/**/*.+(jpg|jpeg|png|gif)")
+  return src("./src/images/**/*.+(jpg|jpeg|png|gif)")
     .pipe(changed("./docs/images"))
     .pipe(
       imagemin([
@@ -60,6 +60,12 @@ const image = () => {
       ])
     )
     .pipe(dest("./docs/images"));
+};
+
+const imageCopy = () => {
+  return src(["./src/images/**/*", "!./src/images/**/*.+(jpg|jpeg|png|gif)"], {
+    base: "src/images/",
+  }).pipe(dest("./docs/images"));
 };
 
 const watchFiles = () => {
@@ -79,7 +85,8 @@ exports.html = html;
 exports.css = css;
 exports.js = js;
 exports.image = image;
+exports.imageCopy = imageCopy;
 exports.watchFiles = watchFiles;
 
-exports.default = series(css, js, image, html);
-exports.dev = series( css, js, image, html, watchFiles);
+exports.default = series(css, js, image, imageCopy, html);
+exports.dev = series(css, js, image, imageCopy, html, watchFiles);
