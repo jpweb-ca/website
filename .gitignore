@@ -4,4 +4,7 @@ node_modules/
 # Design
 design/
 
+# docs (build directory)
+docs/
+
 .DS_Store
