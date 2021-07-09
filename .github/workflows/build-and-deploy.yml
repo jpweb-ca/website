@@ -8,11 +8,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.2.0
@@ -21,10 +23,20 @@ jobs:
           # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn
           cache: npm
 
-      - name: Install npm packages & build
-        run: |
-          npm install
-          npm run build
+
+      - name: Cache npm packages
+        uses: actions/cache@v2
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install npm packages (caching)
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         if: success()
